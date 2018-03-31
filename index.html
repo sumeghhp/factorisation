@@ -1,0 +1,279 @@
+<html lang="en">
+<style>
+.button {
+    background-color: #800080; /* Green */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 12px;
+}
+.factor_input {background-color: #E6E6FA;
+  border-radius: 12px;
+  width: 50px;} /* Blue */
+input[type=number]::-webkit-inner-spin-button {
+  opacity: 1;
+}
+br {
+  content: " ";
+  display: block;
+  margin: 10px;
+}
+.border {
+  border: 5px solid RosyBrown;
+}
+.border-thin {
+  border: 2px solid RosyBrown;
+}
+div#archive_div {
+  width: 90%;
+  margin: 0 auto 0 auto;
+  overflow: hidden;
+}
+.tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+}
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -60px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+.tooltip .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+}
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+.active{
+  background-color: #ff1a8c;
+}
+</style>
+
+
+
+<head>
+  <title>Factorisation system</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1.0,maximum-scale=1.0"/>
+</head>
+
+<script src="libraries/core/d3.v4.min.js"></script>
+<script src="libraries/core/d3-selection-multi.v1.min.js"></script>
+<script src="libraries/core/jquery-3.2.1.min.js"></script>
+
+<script src="libraries/math/math.min.js"></script>
+
+<script src="libraries/ui/popper.min.js"></script>
+<script src="libraries/ui/bootstrap.min.js"></script>
+
+<script type="text/x-mathjax-config"> MathJax.Hub.Config({ extensions: ["tex2jax.js"], jax: ["input/TeX","output/HTML-CSS"], tex2jax: { inlineMath: [["\(","\)"]] } }); </script>
+<script type="text/javascript" src="libraries/math/MathJax/MathJax.js"></script>
+
+<link rel="stylesheet" href="libraries/ui/bootstrap.min.css">
+<link rel="stylesheet" href="libraries/ui/font-awesome-4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="stylesheet.css">
+
+<body>
+<font size="6.5">
+<div class = 'container' style = 'width: 100%'>
+
+  <div class = 'text-center mt-2'>
+    <span class = 'input_span'>
+      <text>Factorize this number: </text>
+      <input type = 'number' placeholder = "0" id = 'text_input' min = "0" max = "99" ></input>
+    </span>
+  </div>
+
+  <div class = 'text-center mt-2'>
+    <span class = 'input_span'>
+      <text>with: </text>
+      <!--      <select id = 'factor_input'>
+        <option value = "1">1</option>
+      </select>-->
+
+
+        <button class = 'factor_input' value= 1> 1</button>
+        <button class = 'factor_input' value= 2> 2</button>
+        <button class = 'factor_input' value= 3> 3</button>
+        <button class = 'factor_input' value= 4> 4</button>
+        <button class = 'factor_input' value= 5> 5</button><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <button class = 'factor_input' value= 6> 6</button>
+        <button class = 'factor_input' value= 8> 8</button>
+        <button class = 'factor_input' value= 7> 7</button>
+        <button class = 'factor_input' value= 9> 9</button>
+        <button class = 'factor_input' value= 10> 10</button>
+
+
+    </span>
+  </div>
+  <p>
+  <div  id = 'archive_div' class="center border"></div></p>
+</div>
+<center><button id = 'clear_archive_btn' class = 'button big-btn ' style="backgroundcolor:red;"> Erase</button></center>
+</font>
+</body>
+
+<script>
+
+jQuery(function($) {
+  $('.factor_input').click(function() {
+    $('.factor_input').not(this).removeClass('active');
+    $(this).addClass('active');
+  });
+});
+var number = 0, factor = 2;
+var data_log = [];
+d3.select('#text_input').on('change', function(){
+  number = parseInt(this.value);
+})
+$('body').on('data_log', function(event, data){
+  var temp = {
+    type: data.type,
+    number: number,
+    factor: factor,
+    timeStamp: Date.now()
+  };
+  data_log.push(temp);
+  submitData(data_log);
+})
+// d3.select('#factor_input').on('click', function(){
+//   //console.log(this.value);
+//   factor = parseInt(this.value);
+//   //d3.selectAll('#factor_input').each(function(){ this.checked = false; })
+//   //this.checked = true;
+//   factorize(number, factor);
+// })
+function setup(){
+  // setupGraph();
+  setupArchive();
+  $('body').trigger('data_log', {type: 'setup'});
+}
+$(document).ready(function(){
+  setup(); //update(); events();
+})
+d3.selectAll('.factor_input').on('click', function(){
+  factor = parseInt(this.value);
+  factorize(number, factor);
+})
+// d3.select('#factor_input').on('change', function(){
+//   // factor = parseInt(this.value);
+//   // console.log(d3.select(this));
+// })
+d3.select('#archive_btn').on('click', function(){
+  factorize(number, factor);
+})
+// $('body').on('enter_clicked', function(){
+//   factorize(number, factor);
+// })
+function factorize(number, factor){
+  quotient = parseInt( number/factor );
+  remainder = parseInt( number%factor );
+  var text = '$$ ' +number+ ' = ' +quotient+ '\\times' +factor+ ' + ' +remainder+ ' $$';
+  d3.select('#archive_div')
+  .append('div')
+  .attrs({ class: 'my-3' })
+  .html(text);
+  MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+  $('body').trigger('data_log', { type: 'archive' });
+}
+function setupArchive(){
+  d3.select('#archive_div')
+  .append('div')
+  .attrs({ class: 'heading_archive' })
+  .html('<center>Board</center>');
+}
+//for writing on the archive/board
+  //d3.select('#archive_btn').on('click', function(){
+//    var text = '$$ ' +number+ ' = ' +quotient+ '\\times' +factor+ ' + ' +remainder+ ' $$';
+  //  d3.select('#archive_div')
+  //  .append('div')
+  //  .attrs({ class: 'my-3' })
+  //  .html(text);
+  //  MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+  //  $('body').trigger('data_log', { type: 'archive' });
+//  })
+//for clearing the archive/board
+  d3.select('#clear_archive_btn').on('click', function(){
+    d3.select('#archive_div').selectAll('div').remove();
+    setupArchive();
+    $('body').trigger('data_log', { type: 'clear_archive' });
+  })
+// Sending data over to server
+
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0; i<ca.length; i++) {
+      var c = ca[i];
+      while (c.charAt(0)==' ') c = c.substring(1);
+      if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
+    }
+}
+function submitData(data_log){
+  var user_id = this.getCookie('user_id');
+  var buddy_ids = this.getCookie('buddy_ids');
+  var sessionid = this.getCookie('sessionid');
+  var data =
+  {
+  "app_name": "ages_puzzle",
+  "params":
+  {
+    data_log,
+    "language" : "en"
+  }
+}
+var data_string = {}
+data_string['user_id'] = this.getCookie('user_id');
+data_string['buddies_ids'] = this.getCookie('buddy_ids');
+var date = new Date();
+var csrftoken;
+csrftoken = this.getCookie('csrftoken');
+var timestamp = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " +  date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+
+data_string['created_at'] = timestamp;
+data_string['sessionid'] = this.getCookie('sessionid');
+for (var key in data) {data_string[key] = data[key];};
+data_string = JSON.stringify(data_string);
+  // var csrftoken;
+  // csrftoken = this.getCookie('csrftoken');
+  $.ajax({
+                type: "POST",
+                data:{
+                      "user_data":data_string,
+                      "app_name":"ages_puzzle",
+                      'csrfmiddlewaretoken':csrftoken,
+                  },
+                url: "/tools/logging",
+                datatype: "json",
+                success: function(data) {
+              }
+});
+}
+</script>
