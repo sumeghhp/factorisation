@@ -242,7 +242,7 @@ function submitData(data_log){
   var sessionid = this.getCookie('sessionid');
   var data =
   {
-  "app_name": "ages_puzzle",
+  "app_name": "factorisation",
   "params":
   {
     data_log,
@@ -267,7 +267,7 @@ data_string = JSON.stringify(data_string);
                 type: "POST",
                 data:{
                       "user_data":data_string,
-                      "app_name":"ages_puzzle",
+                      "app_name":"factorisation",
                       'csrfmiddlewaretoken':csrftoken,
                   },
                 url: "/tools/logging",
