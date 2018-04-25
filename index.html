@@ -148,6 +148,7 @@ jQuery(function($) {
     $(this).addClass('active');
   });
 });
+var timestamp2 = Date(Date.now());
 var number = 0, factor = 2;
 var data_log = [];
 d3.select('#text_input').on('change', function(){
@@ -158,7 +159,7 @@ $('body').on('data_log', function(event, data){
     type: data.type,
     number: number,
     factor: factor,
-    timeStamp: Date.now()
+    timeStamp: Date(Date.now())
   };
   data_log.push(temp);
   submitData(data_log);
@@ -257,6 +258,7 @@ var date = new Date();
 var csrftoken;
 csrftoken = this.getCookie('csrftoken');
 var timestamp = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " +  date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+
 
 data_string['createdAt'] = timestamp;
 data_string['sessionid'] = this.getCookie('sessionid');
